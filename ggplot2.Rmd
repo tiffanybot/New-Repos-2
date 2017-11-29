@@ -1,0 +1,266 @@
+---
+title: "ggplot2 lesson"
+author: "Tiff Stephens"
+date: "11/29/2017"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load packages and examples dataframe
+
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(tidyr)
+  library(dplyr)
+  library(viridis)
+})
+
+# https://knb.ecoinformatics.org/#view/urn:uuid:e05865d7-678d-4513-9061-2ab7d979f8e7
+# Search 'permit value'
+permits <- read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Aa3c58bd6-481e-4c64-aa93-795df10a4664",
+                    stringsAsFactors = FALSE)
+
+unique(permits)
+```
+
+```{r}
+# this code changes ggplot settings to CLASSIC! So don't have to do all the other BS
+theme_set(theme_classic())
+```
+
+
+```{r}
+# make our first plot (this syntax makes the code more modular)
+ggplot(permits, aes(Value, StdDev)) +
+  geom_point()
+
+
+# this makes the permit data available to ONLY the geom_point layer; might be useful for specific plotting goals
+ggplot() + geomn_point(data = permits, aes(Value, StDev))
+
+# same as...
+ggplot(permits) + geom_point(aes(Value, StdDev))
+
+``` 
+
+```{r}
+# add some color
+
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  scale_color_viridis(option = "magma", discrete=TRUE) # had to library(viridis) for this
+
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  scale_color_manual(values = c("red", "orange", "yellow", "green", "blue", "purple", "violet"))
+
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  scale_color_brewer(palette = "Set1")
+```
+
+```{r}
+# remove the scientfic notation on x-axis
+
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  scale_x_continuous(labels = function(val) {format(val, scientific = FALSE)}) + # inline function
+  scale_color_viridis(option = "viridis", discrete=TRUE)
+
+
+
+# WITH THE FUNCTION OUTSIDE OF GGPLOT CODE
+value_formatter = function(val) {
+  format(val, scientific = FALSE)
+}
+
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  scale_x_continuous(labels = value_formatter)
+```
+
+```{r}
+value_formatter = function(val) {
+  format(val, scientific = FALSE)
+}
+
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  scale_x_log10(labels = value_formatter) +
+  scale_color_viridis(option = "viridis", discrete=TRUE)
+
+
+```
+
+
+```{r}
+# change size of points
+
+ggplot(permits, aes(Value, StdDev, color = Gear, size = Range)) +
+  geom_point() +
+  scale_color_viridis(option = "plasma", discrete=TRUE)
+```
+
+```{r}
+# histograms
+
+ggplot(permits, aes(Value)) +
+  geom_histogram(binwidth = 10000) + 
+  scale_color_viridis(option = "plasma", discrete=TRUE)
+```
+
+```{r}
+# boxplot
+ggplot(permits, aes(Gear, Value)) +
+  geom_boxplot() +
+  scale_color_viridis(option = "plasma", discrete=TRUE)
+```
+
+```{r}
+# violin plot
+
+# FIRST want to filter 
+unique(permits$Region)
+
+permits_ci = permits %>%
+  filter(Region == "Cook Inlet")
+
+# PLOT violin
+ggplot(permits_ci, aes(Gear, Value,)) +
+  geom_violin() +
+  geom_point(shape = 1, position = "jitter")  #adds the point distribution inside the violins; jitter distributes the points
+```
+
+```{r}
+# adding smoother / GAM to point plot
+
+ggplot(permits, aes(Value, StdDev)) +
+  geom_point() +
+  geom_smooth(method = "lm") 
+```
+
+```{r}
+# timeline with multiple filters on original dataframe
+se_seine = permits %>%
+  filter(Gear == "Purse Seine",
+         Region == "Southeast")
+
+ggplot(se_seine, aes(Year, Value)) +
+  geom_point() +
+  geom_line() + 
+  scale_y_continuous(limits = c(0,NA)) + # can choose format/scale of axis (this could be great)
+  scale_x_continuous(breaks = seq(min(se_seine$Year),max(se_seine$Year), by = 5)) + # much better way to do breaks on axis
+  coord_cartesian(xlim = c(min(se_seine$Year),max(se_seine$Year)))
+```
+
+```{r}
+# panelling
+
+ggplot(permits_ci, aes(Year, Value)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~Gear, ncol = 1) # the "ncol" allows to stack in column instead of by row...can use "nrow"
+
+# facet_grid can be used for better organization of two factors in distinct rows and columns. e.g. facet_grid(Season~Gear)
+```
+
+```{r}
+# change to theme classic inline
+
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  theme_classic() +
+  theme(legend.position = "top") +
+  scale_color_viridis(option = "magma", discrete=TRUE)
+```
+
+```{r}
+# MAKE A CUSTOM THEME!
+my_theme = theme_classic(base_family = "Times", base_size = 10) + # can change font size and style
+  theme(legend.position = "top")  
+# Can't add color pallette globally to the theme right now, seems that need to add to each plot
+
+ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  my_theme
+
+# save plots
+ggsave("Figures/my_plot.pdf", width = 6, height = 6)
+
+
+# specific plot save
+nice_plot = ggplot(permits, aes(Value, StdDev, color = Gear)) +
+  geom_point() +
+  scale_color_viridis(option = "magma", discrete=TRUE) +
+  my_theme
+print(nice_plot)
+
+ggsave("Figures/nice_plot.pdf", width = 6, height = 6)
+```
+
+
+```{r}
+# TAKE A LOOK AT GGPLOT EXTENSIONS! 
+
+[link](http://www.ggplot2-exts.org/gallery/)
+
+# ggstance
+# gganimate is cool
+# ggfortify
+```
+
+
+
+```{r}
+# combining different plots together on the same
+
+suppressPackageStartupMessages({
+  library(gridExtra)
+})
+
+p1 <- ggplot(se_seine, aes(Year, Value)) +
+  geom_point() + 
+  geom_line()
+
+p2 <- ggplot(permits %>% filter(Gear == "Purse Seine"), aes(Region, Value)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = function(x) { format(x, scientific = FALSE) })
+
+grid.arrange(p1, p2)
+
+
+
+
+# use cowplot for cleaner alignment and design
+
+suppressPackageStartupMessages({
+  library(cowplot)
+})
+
+plot_grid(p1, p2, align = "hv", ncol = 1)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

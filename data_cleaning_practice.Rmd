@@ -161,7 +161,7 @@ catchDF5 %>%
 ```
 
 ```{r}
-# DATES!!! Splitting the month/day/year into seperate columns
+# DATES!!! Splitting the month/day/year into separate columns
 
 dates_df <- data.frame(date = c("5/24/1930",
                                 "5/25/1930",
@@ -170,10 +170,14 @@ dates_df <- data.frame(date = c("5/24/1930",
                                 "5/28/1930"),
                        stringsAsFactors = FALSE)
 
-dates_df %>% 
-  separate(date, c("month", "day", "year"), "/")
+dates_df2 = dates_df %>% 
+  separate(date, c("month", "day", "year"), "/") # "/" tells the code where to split the numbers in to appropriate columns
 ```
 
+```{r}
+dates_df2 %>%
+  unite(date, month, day, year, sep = "/") # to smoosh back the month, day, and year back together
+```
 
 
 

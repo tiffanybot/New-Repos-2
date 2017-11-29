@@ -1,0 +1,91 @@
+---
+title: "Workshop_Practice.Rmd"
+author: "Tiff Stephens"
+date: "11/28/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Library packages:
+```{r, echo=FALSE}
+packages <- c("dataone", "datapack", "devtools", "dplyr", "DT", "EML", "ggplot2", "ggpmisc", "kableExtra", "leaflet", "readxl", "tidyr", "citr")
+
+for (package in packages) { 
+  if (!(package %in% installed.packages())) { 
+    install.packages(package) 
+  } 
+}
+
+rm(packages) #remove variables from workspace
+```
+
+
+
+
+
+
+
+# LET'S DO THIS. 
+
+
+This is a paragraph, with *italics* and __bold__ fonts.
+
+
+Strikethrough can be ~~useful~~ harmful. 
+
+
+Tiff's personal website can be found at: http://tiffstephens.com. 
+
+
+Or use this link notation [Tiff](http://tiffstephens.com)
+
+
+![](images/MacroForest.jpg)
+
+
+
+## Code examples
+
+```{r}
+2+2
+```
+
+This code give result without insetting the code + extra information
+`r sqrt(2)`
+
+Basic table here, make sure to use tabs and have an extra, empty line between text and table. 
+
+|   x |   y |   z |
+|-----|-----|-----|
+|   1 |   2 |   3 |
+|   4 |   5 |   6 |
+
+
+To make an interactive table in the knit file, set it up like this. 
+```{r}
+library(DT)
+library(ggplot2)
+data(mpg)
+DT::datatable(mpg,caption="Milage")
+```
+
+
+To not include the table in the knit file, then change the echo and eval to FALSE
+```{r, echo = FALSE, eval = FALSE}
+library(DT)
+library(ggplot2)
+data(mpg)
+DT::datatable(mpg,caption="Milage")
+```
+
+
+
+
+
+
+
+
+# Back from lunch, starting to work in GitHub, now! 

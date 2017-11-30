@@ -2,6 +2,78 @@
 title: "My_website"
 author: "Tiff Stephens"
 date: "11/29/2017"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
+ 
+ 
+ 
+ 
+ 
+```{r, cache = TRUE, echo = FALSE}
+escapement = read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/knb.92020.1", stringsAsFactors = FALSE)
 
+```
+ 
+```{r}
+library(dplyr); library(tidyr); library(leaflet); library(ggplot2); library(DT)
+```
+ 
+```{r, echo = FALSE}
+# create a new dataframe with years separated
+# then pipe the median annual escapement by species
+
+median_esc = escapement %>% 
+  separate(sampleDate, c("Year", "Month", "Day"), sep = "-") %>%
+  group_by(Species, Location, Year) %>%
+  summarize(escapement = sum(DailyCount, na.rm = TRUE)) %>% # make sure that the "sum" function handles NAs appropriately
+  group_by(Species) %>%
+  summarize(median_escapement = median(escapement))
+
+median_esc
+```
+ 
+```{r}
+theme_set(theme_classic())
+
+ggplot(median_esc, aes(Species, median_escapement)) +
+  geom_col() +
+  coord_flip()
+```
+ 
+```{r}
+# make a sortable table
+
+datatable(median_esc)
+```
+ 
+```{r}
+# setting up to use leaflet
+
+locations = escapement %>%
+  distinct(Location, Latitude, Longitude) %>%
+  drop_na()
+
+
+
+# turn into leaflet map
+
+leaflet(locations) %>%
+  addTiles() %>% #addTiles goes to Open Street Map to reference their map; Leaflet has other options for maps and tiles online
+  addMarkers(~ -abs(Longitude), ~Latitude, popup = ~Location) # "abs" was used because some of the longitudes were wrongly entered 
+```
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

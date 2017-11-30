@@ -1,5 +1,5 @@
 ---
-title: "My_website"
+title: "My Practice Website"
 author: "Tiff Stephens"
 date: "11/29/2017"
 output:
@@ -16,7 +16,7 @@ escapement = read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/knb.92
 
 ```
  
-```{r, warning = FALSE, message = FALSE}
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
 library(dplyr); library(tidyr); library(leaflet); library(ggplot2); library(DT)
 ```
  
@@ -34,7 +34,7 @@ median_esc = escapement %>%
 median_esc
 ```
  
-```{r}
+```{r, echo = FALSE}
 theme_set(theme_classic())
 
 ggplot(median_esc, aes(Species, median_escapement)) +
@@ -42,13 +42,13 @@ ggplot(median_esc, aes(Species, median_escapement)) +
   coord_flip()
 ```
  
-```{r}
+```{r, echo = FALSE}
 # make a sortable table
 
 datatable(median_esc)
 ```
  
-```{r}
+```{r, echo = FALSE}
 # setting up to use leaflet
 
 locations = escapement %>%

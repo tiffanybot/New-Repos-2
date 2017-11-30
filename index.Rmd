@@ -20,7 +20,7 @@ escapement = read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/knb.92
 library(dplyr); library(tidyr); library(leaflet); library(ggplot2); library(DT)
 ```
  
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 # create a new dataframe with years separated
 # then pipe the median annual escapement by species
 

@@ -16,7 +16,7 @@ escapement = read.csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/knb.92
 
 ```
  
-```{r}
+```{r, warning = FALSE}
 library(dplyr); library(tidyr); library(leaflet); library(ggplot2); library(DT)
 ```
  
